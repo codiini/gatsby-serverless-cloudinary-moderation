@@ -14,8 +14,8 @@ export default async function handler(req, res) {
             let cld_upload_stream = cloudinary.uploader.upload_stream(
                 {
                     folder: "moderated-content",
-                    notification_url: "https://example.com/notify_endpoint",
-                    // moderation: "webpurify",
+                    notification_url: "https://gatsbyserverlesscloudinarymode.gtsb.io/api/notification",
+                    moderation: "webpurify",
                 },
                 function (error, result) {
                     console.log(error, result)

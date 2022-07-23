@@ -15,6 +15,8 @@
     "gatsby-plugin-sharp": "^4.18.1",
     "gatsby-source-filesystem": "^4.18.1",
     "gatsby-transformer-sharp": "^4.18.1",
+    "mongodb": "4.8",
+    "mongodb-client-encryption": "^2.1.0",
     "prop-types": "^15.8.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
