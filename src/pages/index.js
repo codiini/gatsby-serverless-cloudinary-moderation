@@ -1,27 +1,70 @@
-import * as React from "react"
+import React, { useState } from "react"
 import * as styles from "../components/index.module.css"
+import { useInterval } from "../utils/interval"
 
 const IndexPage = () => {
-  const [file, setFile] = React.useState()
+  const [file, setFile] = useState()
+  const [uploadedImg, setUploadedImg] = useState()
+  const [moderatedImage, setModeratedImage] = useState()
+  const [timer, setTimer] = useState(60000)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   const submitForm = async e => {
     e.preventDefault()
     const formData = new FormData()
     formData.append("file", file)
     try {
-      await fetch("/api/upload", {
+      const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
-      //set file to null if successful
+      const image = await response.json()
+      setIsLoading(true)
+      setUploadedImg(image)
       setFile(null)
     } catch (err) {
       console.log(err)
     }
   }
+
   const handleFileInputChange = e => {
     setFile(e.target.files[0])
   }
+
+  const getModeratedPhoto = async () => {
+    try {
+      if (uploadedImg) {
+        const response = await fetch("/api/poll", {
+          method: "POST",
+          body: JSON.stringify({
+            asset_id: uploadedImg.asset_id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        const answer = await response.json()
+        console.log(answer)
+        if (answer.status === "approved" || answer.status === "rejected") {
+          setTimer(null)
+        }
+        if (answer.status === "approved") {
+          setIsLoading(false)
+          setModeratedImage(answer)
+        } else if (answer.status === "rejected") {
+          setIsError(true)
+          setIsLoading(false)
+        }
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useInterval(() => {
+    getModeratedPhoto()
+  }, timer)
 
   return (
     <div className={styles.wrapper}>
@@ -50,9 +93,23 @@ const IndexPage = () => {
           </div>
         </form>
         <div className={styles.imageWrapper}>
-          <div>
-            <p>Moderated Image goes in here</p>
-            <img src="" alt="Hello world" />
+          <div className={styles.messages}>
+            {!uploadedImg && <p>Moderated Image goes in here</p>}
+
+            {isError && (
+              <p className={styles.error}>
+                Image has been flagged for inappropriate content
+              </p>
+            )}
+            {isLoading && (
+              <p className={styles.upload}>
+                Image has been uploaded and is pending moderation...
+              </p>
+            )}
+
+            {moderatedImage && (
+              <img src={moderatedImage.url} alt="moderated content" />
+            )}
           </div>
         </div>
       </div>
