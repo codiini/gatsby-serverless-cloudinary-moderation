@@ -6,7 +6,7 @@ const IndexPage = () => {
   const [file, setFile] = useState()
   const [uploadedImg, setUploadedImg] = useState()
   const [moderatedImage, setModeratedImage] = useState()
-  const [timer, setTimer] = useState(60000)
+  const [timer, setTimer] = useState(30000)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
